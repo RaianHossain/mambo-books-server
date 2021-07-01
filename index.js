@@ -7,9 +7,9 @@ app.use(cors())
 app.use(bodyParser.json());
 require('dotenv').config();
 
-const pass = process.env.PASS
+const pass = process.env.DB_PASS
 
-const uri = `uri=mongodb+srv://admin:${pass}@cluster0.nacyh.mongodb.net/mambo-books?retryWrites=true&w=majority`
+const uri = `mongodb+srv://admin:${pass}@cluster0.nacyh.mongodb.net/mambo-books?retryWrites=true&w=majority`
 
 app.get('/', (req, res) => {
   res.send('Hello World!')
