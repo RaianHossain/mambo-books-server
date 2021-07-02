@@ -17,43 +17,56 @@ app.get('/', (req, res) => {
 
 
 const MongoClient = require('mongodb').MongoClient;
-const client = new MongoClient(uri, { useNewUrlParser: true, useUnifiedTopology: true });
+let client = new MongoClient(uri, { useNewUrlParser: true, useUnifiedTopology: true });
 client.connect(err => {
   const collection = client.db("mambo-books").collection("books");
-  const collection1 = client.db("mambo-books").collection("orders");
-  app.post('/addBook', (req, res) => {
+  // perform actions on the collection object
+});
+app.get('/books', (req, res) =>{
+  const client = new MongoClient(uri, { useNewUrlParser: true, useUnifiedTopology: true });
+  client.connect(err => {
+    const collection = client.db("mambo-books").collection("books");
+    collection.find({})
+    .toArray((err, documents) => {
+      res.send(documents);
+    })
+})
+})
+app.post('/placeOrder', (req, res) => {
+  const client = new MongoClient(uri, { useNewUrlParser: true, useUnifiedTopology: true });
+  client.connect(err => {
+    const collection1 = client.db("mambo-books").collection("orders");
+    const newOrder = req.body;
+    console.log(newOrder);
+    collection1.insertOne(newOrder)
+    .then(res => console.log(res.insertedCount))
+    res.send(res.insertedCount>0)
+    })
+  
+})
+app.post('/addBook', (req, res) => {
+  const client = new MongoClient(uri, { useNewUrlParser: true, useUnifiedTopology: true });
+  client.connect(err => {
+    const collection = client.db("mambo-books").collection("books");
     const newBook = req.body;
     console.log(newBook);
     collection.insertOne(newBook)
     .then(res => console.log(res.insertedCount))
     res.send(res.insertedCount > 0)
+  })  
 })
-
-app.get('/books', (req, res) =>{
-  collection.find({})
-  .toArray((err, documents) => {
-    res.send(documents);
-  })
-})
-
-app.post('/placeOrder', (req, res) => {
-  const newOrder = req.body;
-  console.log(newOrder);
-  collection1.insertOne(newOrder)
-  .then(res => console.log(res.insertedCount))
-  res.send(res.insertedCount>0)
-})
-
 app.get('/orderDetails/:email', (req, res) => {
-  console.log(req.params.email);
-  collection1.find({buyer: req.params.email})  
-  .toArray((err, documents) => {
-    res.send(documents);
+  const client = new MongoClient(uri, { useNewUrlParser: true, useUnifiedTopology: true });
+  client.connect(err => {
+    const collection1 = client.db("mambo-books").collection("orders");
+    console.log(req.params.email);
+    collection1.find({buyer: req.params.email})  
+    .toArray((err, documents) => {
+      res.send(documents);
+    })
   })
+  
 })
-  // perform actions on the collection object
-});
-
 
 
 app.listen(process.env.PORT || port, () => {
